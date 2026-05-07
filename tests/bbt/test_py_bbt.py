@@ -83,7 +83,7 @@ class TestPyBBTInitialization:
         """Test that default initialization values are set correctly."""
         model = PyBBT()
         assert model._local_rope_value is None
-        assert model._tie_solver == "spread"
+        assert model._tie_solver == "add"
         assert model._hyper_prior == "log_normal"
         assert model._scale == 1.0
         assert model._maximize

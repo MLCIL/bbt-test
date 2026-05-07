@@ -82,6 +82,61 @@ class TestConstructTable:
         # Then
         np.testing.assert_array_almost_equal(result_table, expected_table)
 
+    def test_construct_win_table_paired_local_rope(self):
+        """Test paired-path win/tie/loss construction for repeated datasets."""
+        data = pd.DataFrame(
+            {
+                "dataset": ["d1", "d1", "d2", "d2"],
+                "alg1": [0.8, 0.9, 0.3, 0.2],
+                "alg2": [0.7, 0.8, 0.4, 0.5],
+            }
+        )
+
+        result_table, _ = _construct_win_table(
+            data=data,
+            data_sd=None,
+            dataset_col="dataset",
+            local_rope_value=0.1,
+            tie_solver="davidson",
+            maximize=True,
+        )
+
+        expected_table = np.array(
+            [
+                [0, 1, 1, 1, 0],
+            ]
+        )
+        np.testing.assert_array_equal(result_table, expected_table)
+
+    def test_construct_win_table_paired_local_rope_three_algorithms(self):
+        """Test paired local-ROPE construction with dataset column and 3 algorithms."""
+        data = pd.DataFrame(
+            {
+                "dataset": ["d1", "d1", "d2", "d2"],
+                "alg1": [0.9, 0.8, 0.4, 0.3],
+                "alg2": [0.8, 0.7, 0.3, 0.2],
+                "alg3": [0.2, 0.1, 0.5, 0.4],
+            }
+        )
+
+        result_table, _ = _construct_win_table(
+            data=data,
+            data_sd=None,
+            dataset_col="dataset",
+            local_rope_value=0.1,
+            tie_solver="davidson",
+            maximize=True,
+        )
+
+        expected_table = np.array(
+            [
+                [0, 1, 2, 0, 0],  # alg1 > alg2 on both datasets
+                [0, 2, 1, 1, 0],  # split decisions across datasets
+                [1, 2, 1, 1, 0],  # split decisions across datasets
+            ]
+        )
+        np.testing.assert_array_equal(result_table, expected_table)
+
 
 class TestUserWarnings:
     """Test whether the correct warnings are raised."""
@@ -111,3 +166,49 @@ class TestUserWarnings:
                 tie_solver="davidson",
                 maximize=True,
             )
+
+
+class TestTieSolvers:
+    """Test tie solver semantics for spread/add/forget strategies."""
+
+    def test_add_solver_assigns_full_point_per_tie(self):
+        """Each tie contributes 1 win to both algorithms in add mode."""
+        data = pd.DataFrame(
+            {
+                "alg1": [0.7],
+                "alg2": [0.7],
+            }
+        )
+
+        add_table, _ = _construct_win_table(
+            data=data,
+            data_sd=None,
+            dataset_col=None,
+            local_rope_value=0.01,
+            tie_solver="add",
+            maximize=True,
+        )
+
+        expected = np.array([[0, 1, 1, 1, 1]])
+        np.testing.assert_array_almost_equal(add_table, expected)
+
+    def test_forget_solver_ignores_ties(self):
+        """Forget mode should leave tie counts out of win totals."""
+        data = pd.DataFrame(
+            {
+                "alg1": [0.7],
+                "alg2": [0.7],
+            }
+        )
+
+        forget_table, _ = _construct_win_table(
+            data=data,
+            data_sd=None,
+            dataset_col=None,
+            local_rope_value=0.01,
+            tie_solver="forget",
+            maximize=True,
+        )
+
+        expected = np.array([[0, 1, 0, 0, 1]])
+        np.testing.assert_array_almost_equal(forget_table, expected)

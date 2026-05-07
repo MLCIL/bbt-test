@@ -96,7 +96,7 @@ class PyBBT:
     def __init__(
         self,
         local_rope_value: float | None = None,
-        tie_solver: TieSolverType = "spread",
+        tie_solver: TieSolverType = "add",
         hyper_prior: HyperPriorType = "log_normal",
         maximize: bool = True,
         scale: float = 1.0,
