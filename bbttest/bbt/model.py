@@ -9,8 +9,8 @@ from ._utils import _get_distribution_for_prior
 def _build_bbt_model(
     player1: list[int],
     player2: list[int],
-    win1: list[int],
-    win2: list[int],
+    win1: list[float],
+    win2: list[float],
     ties: list[int] | None,
     hyp: str,
     scale: float,
@@ -46,7 +46,9 @@ def _build_bbt_model(
     K = len(np.unique(np.concatenate((p1_idx, p2_idx))))
 
     # Transformed data
-    n = w1 + w2
+    n = (w1 + w2).astype(np.int32)
+    w1 = w1.astype(np.int32)
+    w2 = w2.astype(np.int32)
     if use_davidson:
         ties_arr = np.array(ties, dtype=int)
         nn = n + ties_arr

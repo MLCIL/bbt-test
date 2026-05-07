@@ -11,6 +11,10 @@ MockLiteralType = Literal["option1", "option2", "option3"]
 def mock_fun(param_lit: MockLiteralType, param_str: str): ...
 
 
+@_validate_params
+def mock_fun_with_kwargs(param_lit: MockLiteralType, **kwargs): ...
+
+
 class TestLiteralValidation:
     """Tests _validate_params decorator for validating parameters."""
 
@@ -37,3 +41,11 @@ class TestLiteralValidation:
             ValueError, match="Unexpected keyword argument 'unexpected_kwarg'"
         ):
             mock_fun(param_lit="option1", param_str="valid string", unexpected_kwarg=42)
+
+    def test_unexpected_kwarg_ignored_with_var_keyword(self):
+        """Test if _validate_params ignores extra kwargs when **kwargs is declared."""
+        mock_fun_with_kwargs(
+            param_lit="option1",
+            unexpected_kwarg=42,
+            another_kwarg="value",
+        )

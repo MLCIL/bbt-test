@@ -36,6 +36,7 @@ dev = [
     "pre-commit",
     "ruff",
     "seaborn",
+    "graphviz",
 ]
 test = [
     "pre-commit",

@@ -25,19 +25,25 @@ def is_literal_value(value: object, typx: object) -> bool:
 
 
 def _validate_params(func):
-    from inspect import signature
+    from inspect import Parameter, signature
 
     sig = signature(func)
+    accepts_kwargs = any(
+        param.kind == Parameter.VAR_KEYWORD for param in sig.parameters.values()
+    )
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        for kwarg in kwargs:
-            if kwarg not in sig.parameters:
-                raise ValueError(f"Unexpected keyword argument '{kwarg}'")
+        if not accepts_kwargs:
+            for kwarg in kwargs:
+                if kwarg not in sig.parameters:
+                    raise ValueError(f"Unexpected keyword argument '{kwarg}'")
         bound_args = sig.bind(*args, **kwargs)
         bound_args.apply_defaults()
         for name, value in bound_args.arguments.items():
             param = sig.parameters[name]
+            if param.kind == Parameter.VAR_KEYWORD:
+                continue
             # If type annotation is a Literal, validate the value
             if param.annotation is not param.empty and is_literal_value(
                 value, param.annotation
