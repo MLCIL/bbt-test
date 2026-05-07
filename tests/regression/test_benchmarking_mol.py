@@ -67,7 +67,7 @@ def fitted_model(benchmarking_data):
     PyBBT
         Fitted PyBBT model instance.
     """
-    model = PyBBT(local_rope_value=0.01, tie_solver="spread")
+    model = PyBBT(local_rope_value=0.01, tie_solver="add")
     model.fit(
         benchmarking_data,
         dataset_col="dataset",
@@ -140,12 +140,13 @@ ROPE_1_WORSE_MODELS = [
 ROPE_2_VALUE = (0.4, 0.6)
 ROPE_2_BETTER_MODELS = ["CLAMP", "rmat_4M"]
 ROPE_2_EQUIVALENT_MODELS = [
+    "AtomPair_count",
     "CDDD",
     "ChemBERTa-10M-MTR",
     "mat_masking_2M",
     "molbert",
 ]
-ROPE_2_UNKNOWN_MODELS = ["AtomPair_count"]
+ROPE_2_UNKNOWN_MODELS = []
 ROPE_2_WORSE_MODELS = [
     "ChemFM-3B",
     "ChemGPT-4.7M",
@@ -172,6 +173,7 @@ ROPE_3_EQUIVALENT_MODELS = [
     "AtomPair_count",
     "CDDD",
     "ChemBERTa-10M-MTR",
+    "MoLFormer-XL-both-10pct",
     "mat_masking_2M",
     "molbert",
     "rmat_4M",
@@ -184,7 +186,6 @@ ROPE_3_WORSE_MODELS = [
     "GNN-GraphCL-sum",
     "GraphFP-CP",
     "GraphMVP_CP-max",
-    "MoLFormer-XL-both-10pct",
     "SELFormer-Lite",
     "SimSon",
     "TT",

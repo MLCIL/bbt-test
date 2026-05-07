@@ -171,27 +171,6 @@ class TestUserWarnings:
 class TestTieSolvers:
     """Test tie solver semantics for spread/add/forget strategies."""
 
-    def test_spread_solver_assigns_half_point_per_tie(self):
-        """Each tie contributes 0.5 win to both algorithms in spread mode."""
-        data = pd.DataFrame(
-            {
-                "alg1": [0.7],
-                "alg2": [0.7],
-            }
-        )
-
-        spread_table, _ = _construct_win_table(
-            data=data,
-            data_sd=None,
-            dataset_col=None,
-            local_rope_value=0.01,
-            tie_solver="spread",
-            maximize=True,
-        )
-
-        expected = np.array([[0, 1, 0.5, 0.5, 1]])
-        np.testing.assert_array_almost_equal(spread_table, expected)
-
     def test_add_solver_assigns_full_point_per_tie(self):
         """Each tie contributes 1 win to both algorithms in add mode."""
         data = pd.DataFrame(

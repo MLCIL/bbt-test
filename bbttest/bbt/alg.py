@@ -46,7 +46,7 @@ def _construct_no_paired(
     no_pairs = no_algs * (no_algs - 1) // 2
     out_array = -1 * np.ones(
         (no_pairs, 5),  # alg_1, alg_2, 1_wins, 2_wins, ties
-        dtype=np.float32,
+        dtype=np.int32,
     )
     for i, j, k in tqdm(
         _gen_pairs(no_algs),
@@ -83,7 +83,7 @@ def _construct_lrope(
     no_pairs = no_algs * (no_algs - 1) // 2
     out_array = np.zeros(
         (no_pairs, 5),  # alg_1, alg_2, 1_wins, 2_wins, ties
-        dtype=np.float32,
+        dtype=np.int32,
     )
     for dataset_name in data[dataset_col].unique():
         data_subset = data[data[dataset_col] == dataset_name]
@@ -114,7 +114,7 @@ def _solve_ties(table: np.ndarray, tie_solver: str) -> np.ndarray:
     if tie_solver == "davidson":
         return table
     if tie_solver == "spread":
-        tie_val = table[:, TIE_COL] / 2
+        tie_val = np.ceil(table[:, TIE_COL] / 2).astype(int)
     elif tie_solver == "add":
         tie_val = table[:, TIE_COL]
     else:
