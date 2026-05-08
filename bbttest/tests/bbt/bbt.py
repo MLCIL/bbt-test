@@ -41,13 +41,15 @@ class BBTTest:
 
         If None, no ties are recorded.
 
-    tie_solver: str, defaults to `spread`
+    tie_solver: str, defaults to `add`
         The strategy to handle ties when sampling the BBT model.
 
             - `add` - Adds 1 win to both players for each tie.
             - `spread` - Adds 0.5 win to both players for each tie.
             - `forget` - Ignores the ties.
             - `davidson` - Uses Davidson's method to handle ties in the BBT model. See [1]_.
+        Note: we found inconsistencies in mathematical foundations of the `spread` method, which we still investigate.
+            For the time being, we recommend using alternative methods such as `add`.
 
     hyper_prior: str, default `log_normal`
         The hyper prior distribution to be used for the BBT MCMC sampling.
@@ -74,7 +76,7 @@ class BBTTest:
     ...     'model_b': [0.7, 0.8, 0.85],
     ...     'model_c': [0.6, 0.65, 0.7]
     ... })
-    >>> model = BBTTest(local_rope_value=0.01, tie_solver="spread")
+    >>> model = BBTTest(local_rope_value=0.01, tie_solver="add")
     >>> model.fit(data, dataset_col='dataset')
     >>> model.posterior_table(rope_value=(0.45, 0.55))
 
